@@ -23,3 +23,19 @@ const server= http.createServer((req, res)=>{
         method, url}=req;
         res.setHeader('content-type', 'application/json');
 })
+if(method==='get'&& url==='/movies'){
+    return readdata((movies)=>{
+        res.writehead(200);
+        res.end(JSON.stringify(movies));
+    });
+}
+if (method==='get'&& url.startswith('/movies/')){
+    const id=Number(url.split('/')[2]);
+    return readdata((movies)=>{
+        const movie=movies.find(m=>m.id===id);
+        res.writehead(200);
+        res.end(JSON.stringify(movie ||
+            {
+            message:'movie not found'}));
+    });
+}
