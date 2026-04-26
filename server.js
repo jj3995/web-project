@@ -62,3 +62,38 @@ if(method==='post'&& url==='/movies'){
         });
     });
 }
+if(method==='put'&&url.startswith('/movies/')){
+    const id=Number(url.split('/')[2]);
+    let body='';
+    req.on('data', chunk=> body+=chunk);
+    req.on('end', ()=>{
+        const updateddata=JSON.parse(body);
+        if(
+           updateddata.rating !==undefined&&(updateddata.rating<1||updateddata.rating>10) 
+        ){
+            res.writehead(400);
+            return res.end(JSON.stringify({
+                message:'rating should be between 1 and 10'
+            }));
+        }
+        readdata((movies)=>{
+            const index=movies.findindex(m=>m.id===id);
+            if(index===-1){
+                res.writehead(404);
+                return res.end(JSON.stringify({
+                    message:'movie not found'
+                }));
+            }
+            movies[index]={
+                id:movies[index].id,
+                title:updateddata.title||movies[index].title,
+                review:updateddata.review||movies[index].review,
+                rating:updateddata.rating||movies[index].rating
+            };
+            writedata(movies,()=>{
+                res.writehead(200);
+                res.end(JSON.stringify(movies[index]));
+            });
+        });
+    });
+}
