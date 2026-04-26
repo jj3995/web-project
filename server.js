@@ -97,3 +97,22 @@ if(method==='put'&&url.startswith('/movies/')){
         });
     });
 }
+if(method==='delete'&&url.startswith('/movies/')){
+    const id=Number(url.split('/')[2]);
+    readdata((movies)=>{
+        const filtered=movies.filter(m=>m.id!==id);
+        writedata(filtered, ()=>{
+            res.writehead(200);
+            res.end(JSON.stringify({
+                message:'deleted successfully'
+            }));
+        });
+    });
+}
+res.writehead(404);
+res.end(JSON.stringify({
+    message:'route not found'
+}));
+server.listen(PORT, ()=>{
+    console.Consolelog('server running on http://localhost:${PORT}');
+});
