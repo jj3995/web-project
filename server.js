@@ -15,3 +15,11 @@ fs.readFile(FILE, 'utf-8', (error, data)=>{
     }
 });
 }
+function writedata(data, callback){
+    fs.writeFile(FILE, JSON.stringify(data, null, 2), callback);
+}
+const server= http.createServer((req, res)=>{
+    const{
+        method, url}=req;
+        res.setHeader('content-type', 'application/json');
+})
