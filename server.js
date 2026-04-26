@@ -39,3 +39,10 @@ if (method==='get'&& url.startswith('/movies/')){
             message:'movie not found'}));
     });
 }
+if(method==='post'&& url==='/movies'){
+    let body='';
+    req.on('data', chunk=>body+=chunk);
+    req.on('end', ()=>{
+        const newmovie=JSON.parse(body);
+    })
+}
