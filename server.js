@@ -44,5 +44,21 @@ if(method==='post'&& url==='/movies'){
     req.on('data', chunk=>body+=chunk);
     req.on('end', ()=>{
         const newmovie=JSON.parse(body);
-    })
+        if(
+            !newmovie.title|| !newmovie.review|| !newmovie.rating !== 'nimber'||newmovie.rating<1||newmovie.rating>10
+        ){
+            res.writehead(400);
+            return res.end(JSON.stringify({
+                message:'rating should be between 1 and 10'
+            }));
+        }
+        readdata((movies)=>{
+            newmovie.id=Date.now();
+            movies.push(newmovie);
+            writedata(movies, ()=>{
+                res.writehead(201);
+                res.end(JSON.stringify(newmovie));
+            });
+        });
+    });
 }
