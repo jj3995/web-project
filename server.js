@@ -1,6 +1,5 @@
 const http=require('http');
 const fs=require('fs');
-const { error } = require('console');
 
 const PORT=4000;
 const FILE='./movies.json';
@@ -21,33 +20,35 @@ function writedata(data, callback){
 const server= http.createServer((req, res)=>{
     const{
         method, url}=req;
-        res.setHeader('content-type', 'application/json');
+        res.setHeader('Content-type', 'application/json');
 })
-if(method==='get'&& url==='/movies'){
+if(method==='GET'&& url==='/movies'){
     return readdata((movies)=>{
-        res.writehead(200);
+        res.writeHead(200);
         res.end(JSON.stringify(movies));
     });
 }
-if (method==='get'&& url.startswith('/movies/')){
+if (method==='GET'&& url.startsWith('/movies/')){
     const id=Number(url.split('/')[2]);
     return readdata((movies)=>{
         const movie=movies.find(m=>m.id===id);
-        res.writehead(200);
+        if(!movie){
+        res.writeHead(404);
         res.end(JSON.stringify(movie ||
             {
             message:'movie not found'}));
+        }
     });
 }
-if(method==='post'&& url==='/movies'){
+if(method==='POST'&& url==='/movies'){
     let body='';
     req.on('data', chunk=>body+=chunk);
     req.on('end', ()=>{
         const newmovie=JSON.parse(body);
         if(
-            !newmovie.title|| !newmovie.review|| !newmovie.rating !== 'nimber'||newmovie.rating<1||newmovie.rating>10
+            !newmovie.title|| !newmovie.review|| !newmovie.rating !== 'number'||newmovie.rating<1||newmovie.rating>10
         ){
-            res.writehead(400);
+            res.writeHead(400);
             return res.end(JSON.stringify({
                 message:'rating should be between 1 and 10'
             }));
@@ -56,7 +57,7 @@ if(method==='post'&& url==='/movies'){
             newmovie.id=Date.now();
             movies.push(newmovie);
             writedata(movies, ()=>{
-                res.writehead(201);
+                res.writeHead(201);
                 res.end(JSON.stringify(newmovie));
             });
         });
@@ -71,15 +72,15 @@ if(method==='put'&&url.startswith('/movies/')){
         if(
            updateddata.rating !==undefined&&(updateddata.rating<1||updateddata.rating>10) 
         ){
-            res.writehead(400);
+            res.writeHead(400);
             return res.end(JSON.stringify({
                 message:'rating should be between 1 and 10'
             }));
         }
         readdata((movies)=>{
-            const index=movies.findindex(m=>m.id===id);
+            const index=movies.findIndex(m=>m.id===id);
             if(index===-1){
-                res.writehead(404);
+                res.writeHead(404);
                 return res.end(JSON.stringify({
                     message:'movie not found'
                 }));
@@ -91,7 +92,7 @@ if(method==='put'&&url.startswith('/movies/')){
                 rating:updateddata.rating||movies[index].rating
             };
             writedata(movies,()=>{
-                res.writehead(200);
+                res.writeHead(200);
                 res.end(JSON.stringify(movies[index]));
             });
         });
@@ -102,17 +103,17 @@ if(method==='delete'&&url.startswith('/movies/')){
     readdata((movies)=>{
         const filtered=movies.filter(m=>m.id!==id);
         writedata(filtered, ()=>{
-            res.writehead(200);
+            res.writeHead(200);
             res.end(JSON.stringify({
                 message:'deleted successfully'
             }));
         });
     });
 }
-res.writehead(404);
+res.writeHead(404);
 res.end(JSON.stringify({
     message:'route not found'
 }));
 server.listen(PORT, ()=>{
-    console.Consolelog('server running on http://localhost:${PORT}');
+    Console.log('server running on http://localhost:${PORT}');
 });
